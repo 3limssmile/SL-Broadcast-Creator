@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCP:SL Broadcast Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://raw.githubusercontent.com/3limssmile/SL-Broadcast-Creator/main/assets/icon.png" type="image/png">
+</head>
+
+<body>
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <i class="fa-solid fa-server"></i>
+                <span>SCP:SL Broadcast Creator</span>
+            </div>
+            <div class="topbar-right">
+                <a href="https://github.com/3limssmile/SL-Broadcast-Creator"><i class="fa-brands fa-github"></i>GitHub</a>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="card header-card" style="flex-shrink: 0; margin-bottom: 0; padding: 10px !important;">
+                <h2 style="margin-bottom: 2px; font-size: 1.2rem;">SCP:SL Rich Text Broadcasts</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 0;">Create beautiful gradient broadcasts or format standard
+                    text for Remote Admin.</p>
+            </div>
+
+            <div class="card preview-card" style="flex-shrink: 0; margin-bottom: 0; padding: 10px 15px;">
+                <h3 style="margin-bottom: 5px; padding-bottom: 5px;"><i class="fa-solid fa-eye"></i> Visual Preview</h3>
+                <div id="live-preview" class="preview-box"
+                    style="flex: 1; min-height: 100px; max-height: 25vh; padding: 10px; font-size: 45px;">
+                    Hello SCP:SL Server!
+                </div>
+            </div>
+
+            <div class="grid-container" style="flex: 1; min-height: 0;">
+                <!-- Left Column -->
+                <div class="grid-column">
+                    <div class="card" style="flex-grow: 1; display: flex; flex-direction: column; margin-bottom: 0;">
+                        <h3 style="flex-shrink: 0; margin-bottom: 10px; padding-bottom: 5px;"><i
+                                class="fa-solid fa-pen-nib"></i> Broadcast Settings</h3>
+
+                        <div class="form-row" style="flex-shrink: 0; margin-bottom: 10px;">
+                            <div class="form-group" style="flex: 0 0 150px; margin-bottom: 0;">
+                                <label for="input-time" style="margin-bottom: 4px;">Time (Seconds):</label>
+                                <input type="number" id="input-time" value="10" min="1" max="300"
+                                    style="padding: 8px 12px;">
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                            style="flex-grow: 1; display: flex; flex-direction: column; margin-bottom: 0; min-height: 0;">
+                            <label style="flex-shrink: 0; margin-bottom: 4px;">Text Content:</label>
+
+                            <!-- Formatting Toolbar -->
+                            <div class="format-toolbar" style="flex-shrink: 0; padding: 5px;">
+                                <button class="format-btn" data-tag="b" title="Bold"
+                                    style="padding: 4px 8px;"><b>B</b></button>
+                                <button class="format-btn" data-tag="i" title="Italic"
+                                    style="padding: 4px 8px;"><i>I</i></button>
+                                <button class="format-btn" data-tag="u" title="Underline"
+                                    style="padding: 4px 8px;"><u>U</u></button>
+                                <button class="format-btn" data-tag="s" title="Strikethrough"
+                                    style="padding: 4px 8px;"><s>S</s></button>
+                                <button class="format-btn format-mark" title="Marker"
+                                    style="padding: 4px 8px;">Mark</button>
+                                <div class="toolbar-separator" style="height: 15px;"></div>
+
+                                <div class="format-tool-group">
+                                    <label for="size-slider" style="margin:0; font-size:0.75rem;">Size:</label>
+                                    <input type="range" id="size-slider" min="15" max="178" value="45"
+                                        style="width: 50px;">
+                                    <input type="number" id="size-input" value="45" min="1" max="178"
+                                        class="toolbar-text-input no-spin"
+                                        style="width: 35px; height: 20px; text-align: center;">
+                                    <button class="format-btn format-size" title="Apply Size"
+                                        style="padding: 4px 8px;"><i class="fa-solid fa-text-height"></i></button>
+                                </div>
+
+                                <div class="toolbar-separator" style="height: 15px;"></div>
+
+                                <div class="format-tool-group">
+                                    <label for="color-picker" style="margin:0; font-size:0.75rem;">Color:</label>
+                                    <input type="color" id="color-picker" value="#00FF20" class="toolbar-color-picker"
+                                        style="width: 20px !important; height: 20px;">
+                                    <input type="text" id="color-hex-input" value="#00FF20" class="toolbar-text-input"
+                                        style="width: 70px; height: 20px; text-transform: uppercase;" maxlength="7">
+                                    <button class="format-btn format-color" title="Apply Color"
+                                        style="padding: 4px 8px;"><i class="fa-solid fa-palette"></i></button>
+                                </div>
+                            </div>
+
+                            <textarea id="input-text"
+                                style="flex-grow: 1; resize: none; margin-bottom: 0; min-height: 0; overflow-y: auto;">Hello SCP:SL Server!</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="grid-column">
+                    <!-- Color Effects -->
+                    <div class="card" style="flex-shrink: 0; margin-bottom: 0;">
+                        <h3 style="margin-bottom: 10px; padding-bottom: 5px;"><i class="fa-solid fa-fill-drip"></i>
+                            Color Effect</h3>
+                        <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 8px;">
+                            Applies a color effect across the entire text above. It will safely ignore your inline
+                            formatting tags.
+                        </p>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label for="effect-type" style="margin-bottom: 4px;">Effect Type:</label>
+                            <select id="effect-type" style="padding: 8px 12px;">
+                                <option value="none">None</option>
+                                <option value="gradient">Gradient</option>
+                                <option value="rainbow">Rainbow</option>
+                                <option value="random">Random Letters</option>
+                                <option value="randomWord">Random Words</option>
+                            </select>
+                        </div>
+
+                        <div id="colors-container"
+                            style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; max-height: 120px; overflow-y: auto;">
+                        </div>
+                        <button id="add-color-btn" class="btn btn-secondary" style="padding: 8px 15px;"><i
+                                class="fa-solid fa-plus"></i> Add Color</button>
+                    </div>
+
+                    <!-- Output -->
+                    <div class="card output-card"
+                        style="flex-grow: 1; display: flex; flex-direction: column; margin-bottom: 0; min-height: 0;">
+                        <h3 style="flex-shrink: 0; margin-bottom: 10px; padding-bottom: 5px;"><i
+                                class="fa-terminal fa-solid"></i> Remote Admin Command</h3>
+
+                        <div class="form-group"
+                            style="flex-grow: 1; display: flex; flex-direction: column; margin-bottom: 0; min-height: 0;">
+                            <label style="flex-shrink: 0; margin-bottom: 8px;">Paste this in RA console:</label>
+                            <div class="output-row"
+                                style="flex-grow: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0;">
+                                <textarea id="output-bc" readonly
+                                    style="flex-grow: 1; resize: none; overflow-y: auto; min-height: 0; font-family: monospace; font-size: 1rem; color: #4ade80; background-color: #000; padding: 12px 15px;"></textarea>
+                                <button class="btn btn-primary copy-btn" data-target="output-bc"
+                                    style="flex-shrink: 0;"><i class="fa-solid fa-copy"></i> Copy Command</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
