@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 5. Finalize the command
         elements.outputBc.value = `bc ${time} ${unityOut}`;
-        elements.livePreview.innerHTML = previewHtml;
+        elements.livePreview.innerHTML = `<div style="width: 100%;">${previewHtml}</div>`;
     }
 
     // --- Listeners ---
