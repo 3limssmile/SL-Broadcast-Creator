@@ -26,6 +26,13 @@ body {
     overflow: hidden;
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+}
+
 /* Main Content Area */
 .main-content {
     flex: 1;
@@ -35,6 +42,7 @@ body {
     width: 100%;
 }
 
+/* ── Topbar (Updated for responsiveness) ── */
 .topbar {
     height: 60px;
     background-color: var(--bg-sidebar);
@@ -44,6 +52,9 @@ body {
     justify-content: space-between;
     padding: 0 30px;
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .topbar-left {
@@ -53,6 +64,46 @@ body {
     font-weight: 700;
     font-size: 1.2rem;
     color: var(--accent-blue);
+    min-width: 200px;
+}
+
+.topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+
+.topbar-nav a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.topbar-nav a:hover {
+    color: var(--text-primary);
+    background-color: rgba(255,255,255,0.06);
+}
+
+.topbar-nav a.active {
+    color: var(--accent-blue);
+    background-color: rgba(0, 168, 255, 0.1);
+    border-color: rgba(0, 168, 255, 0.25);
+}
+
+.topbar-right {
+    min-width: 200px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .topbar-right a {
@@ -69,12 +120,59 @@ body {
     color: var(--accent-blue);
 }
 
+/* ── Mobile Toggle & Hamburger ── */
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1100;
+}
+
+.hamburger-menu {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 10px;
+    z-index: 1050;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.hamburger-menu.open {
+    transform: translateX(0);
+}
+
+.hamburger-menu a {
+    padding: 15px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hamburger-menu a.active {
+    color: var(--accent-blue);
+    background-color: rgba(0, 168, 255, 0.05);
+}
+
 .content-wrapper {
     flex: 1;
     padding: 10px 20px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
@@ -233,6 +331,13 @@ textarea {
 
 .format-btn i {
     font-size: 0.8rem;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: var(--border-color);
+    margin: 0 5px;
 }
 
 .format-tool-group {
@@ -413,6 +518,69 @@ input[type="number"].no-spin {
     flex-grow: 1;
 }
 
+/* Keycard 3D preview */
+.kc-grid {
+    grid-template-columns: 1fr 1fr 1.15fr;
+}
+
+.kc-preview {
+    position: relative;
+    flex: 1;
+    min-height: 260px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: radial-gradient(circle at 50% 45%, #1f1f1f 0%, #0b0b0b 75%);
+    overflow: hidden;
+}
+
+.kc-preview-canvas {
+    position: absolute;
+    inset: 0;
+    cursor: grab;
+}
+
+.kc-preview-canvas:active {
+    cursor: grabbing;
+}
+
+.kc-preview-note {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.kc-preview-reset {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.kc-preview-reset:hover {
+    color: var(--text-primary);
+}
+
+.kc-credit {
+    font-size: 0.72rem;
+    margin: 8px 0 0;
+    flex-shrink: 0;
+}
+
+.kc-credit a {
+    color: var(--text-secondary);
+}
+
 /* Output Area */
 .output-row {
     position: relative;
@@ -441,77 +609,47 @@ input[type="number"].no-spin {
 
 /* Responsive */
 @media (max-width: 1100px) {
-    body {
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    .main-content, 
-    .content-wrapper {
-        overflow: visible;
-        height: auto;
-    }
-
     .grid-container {
-        display: flex !important;
-        flex-direction: column;
-        height: auto;
+        grid-template-columns: 1fr;
     }
 
-    .grid-column {
-        height: auto;
-        min-height: min-content;
-    }
-
-    .card {
-        height: auto !important;
-        min-height: min-content !important;
-        flex: none !important;
-        margin-bottom: 10px !important;
-    }
-
-    .form-group,
-    .output-row {
-        height: auto !important;
-        min-height: min-content !important;
-        flex: none !important;
-    }
-
-    #live-preview.preview-box {
-        min-height: 150px !important;
-        max-height: none !important;
-        flex: none !important;
-    }
-
-    #input-text {
-        min-height: 200px !important;
-        flex: none !important;
-    }
-
-    #output-bc {
-        min-height: 150px !important;
-        flex: none !important;
-    }
-
-    .topbar {
-        padding: 0 15px;
-    }
-    
-    .topbar-left {
-        font-size: 1rem;
+    .kc-preview {
+        min-height: 340px;
     }
 }
 
-@media (max-width: 700px) {
-    .format-toolbar {
-        justify-content: center;
-    }
-    
-    .form-row {
-        flex-direction: column !important;
-        gap: 10px !important;
+@media (max-width: 850px) {
+    body, #root, .main-content {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
     }
 
+    .topbar-nav, .topbar-right {
+        display: none;
+    }
+
+    .mobile-toggle {
+        display: block;
+    }
+
+    .topbar-left {
+        min-width: auto;
+        flex: 1;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .content-wrapper {
+        overflow: visible;
+    }
+}
+
+@media (max-width: 600px) {
+    .topbar-left span {
+        display: none;
+    }
 }
