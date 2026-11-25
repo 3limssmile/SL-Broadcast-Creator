@@ -1,4 +1,4 @@
-# Keycard assets – licence and attribution
+# Keycard assets: licence and attribution
 
 The files in this folder are derived from **SCP: Secret Laboratory** by Northwood Studios
 (https://scpslgame.com/), which is licensed under the

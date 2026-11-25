@@ -1,6 +1,3 @@
-// 3D keycard preview built from SCP: Secret Laboratory assets (CC BY-SA 3.0, see src/assets/keycard/LICENSE.md).
-// The card print is repainted on a canvas the way the game does it: tint, permission marks, label, holder name,
-// serial digits and rank rings.
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
@@ -19,7 +16,6 @@ import taskforceUrl from '../assets/keycard/taskforce.glb?url'
 import managementUrl from '../assets/keycard/management.glb?url'
 import metalcaseUrl from '../assets/keycard/metalcase.glb?url'
 
-// ---------- Colours (the game accepts #hex or Unity colour names) ----------
 const UNITY_COLORS = {
   red: '#ff0000', cyan: '#00ffff', blue: '#0000ff', darkblue: '#0000a0', lightblue: '#add8e6', purple: '#800080',
   yellow: '#ffff00', lime: '#00ff00', fuchsia: '#ff00ff', white: '#ffffff', silver: '#c0c0c0', grey: '#808080',
@@ -38,7 +34,6 @@ export function parseColor(value, fallback) {
 const rgb01 = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16) / 255)
 const clean = s => String(s || '').replace(/_/g, ' ')
 
-// ---------- Asset loading ----------
 const loadImage = src => new Promise((resolve, reject) => {
   const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = src
 })
@@ -71,10 +66,6 @@ const ATLAS_SOURCES = {
   a4: { albedo: a4IconsUrl },
 }
 
-// ---------- Painting (coordinates are 2048 atlas pixels) ----------
-// The game multiplies the albedo by the tint where the mask allows it (tint map R), in linear colour space,
-// with the mask itself read as sRGB (so a mask value of 188 tints only ~50%). Tint map G shades the Site-02
-// label band with the "SITE ACCESS CARD" microtext.
 const S2L = Float32Array.from({ length: 256 }, (_, i) => { const c = i / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 })
 const L2S = Uint8ClampedArray.from({ length: 4096 }, (_, i) => { const c = i / 4095; return 255 * (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055) })
 const toS = l => L2S[Math.min(4095, Math.round(l * 4095))]
@@ -91,8 +82,6 @@ function tintRect(A, x, y, w, h, tint) {
   }
   A.ctx.putImageData(img, x, y)
 }
-// Filled cells: the permission colour at full brightness, keeping the print texture of the cell (albedo
-// normalised to the cell's own average), so white permissions stay white even on the grey Task Force print
 function circles(A, color, cells, r) {
   const c = rgb01(color), B = A.base
   for (const [cx, cy] of cells) {
@@ -114,16 +103,12 @@ function circles(A, color, cells, r) {
     A.ctx.putImageData(img, x0, y0)
   }
 }
-// [category, n-th cell from the icon side] for every filled permission cell
 function levelCells(levels) {
   const out = []
   levels.forEach((lvl, c) => { for (let n = 0; n < Math.min(3, Math.max(0, lvl | 0)); n++) out.push([c, n]) })
   return out
 }
 
-// In-game text boxes (TextMeshPro, Roboto-Bold SDF) read from the prefabs.
-// c = box centre, a = text direction (deg), W/H = box size. The game auto-sizes to the largest size whose
-// line box (1.17 em per line) fits H; Site-02 / metal case labels may first squeeze glyphs horizontally by up to 30%.
 const TX = {
   s02Label: { c: [654.7, 449.1], a: 0, W: 1245, H: 202, h: 'left', v: 'geometry', adj: 0.3 },
   mcLabel: { c: [644.2, 449.1], a: 0, W: 1245, H: 202, h: 'left', v: 'geometry', adj: 0.3 },
@@ -131,8 +116,8 @@ const TX = {
   tfNick: { c: [180.9, 1703.5], a: -90, W: 597, H: 77.4, h: 'left', v: 'top' },
   mgLabel: { c: [1696.6, 1929.8], a: 180, W: 591, H: 222, h: 'right', v: 'geometry', wrap: true, lineAdv: 0.872 },
 }
-const LINE = 1.17, ASC = 0.928   // Roboto line box and ascender, in em
-const OUTLINE = 0.022            // outline width in em, measured on an in-game screenshot
+const LINE = 1.17, ASC = 0.928
+const OUTLINE = 0.022
 const FONT = 'KeycardRoboto'
 function layoutText(ctx, text, b) {
   const words = text.split(/\s+/).filter(Boolean)
@@ -162,11 +147,10 @@ function drawText(ctx, text, b, color) {
   const x = (b.h === 'left' ? -b.W / 2 : b.W / 2) / sx
   let y0
   if (b.v === 'top') y0 = -b.H / 2 + ASC * size
-  else {   // 'geometry': centre the actual glyph bounds
+  else {
     const first = ctx.measureText(lines[0]), last = ctx.measureText(lines[lines.length - 1])
     y0 = (first.actualBoundingBoxAscent - (lines.length - 1) * adv - last.actualBoundingBoxDescent) / 2
   }
-  // the game's text material (TMP SDF, HDRP) draws a thin white outline layer around every glyph
   ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = OUTLINE * size * 2
   lines.forEach((l, i) => ctx.strokeText(l, x, y0 + i * adv))
   lines.forEach((l, i) => ctx.fillText(l, x, y0 + i * adv))
@@ -176,7 +160,6 @@ function drawText(ctx, text, b, color) {
 function paintSite02(A, f) {
   A.ctx.clearRect(0, 0, SIZE, SIZE); A.ctx.drawImage(A.img, 0, 0)
   tintRect(A, 13, 312, 1287, 860, f.tint)
-  // categories are rows (gear = admin, gun = armory, SCP = containment), filled from the column next to the icons
   const COLS = [124, 323, 523], ROWS = [651, 851, 1053]
   circles(A, f.perm, levelCells([f.adm, f.arm, f.cont]).map(([c, n]) => [COLS[2 - n], ROWS[c]]), 58)
   drawText(A.ctx, clean(f.label), f.type === 'metalcase' ? TX.mcLabel : TX.s02Label, f.labelColor)
@@ -187,13 +170,11 @@ function paintA1(A, f) {
   A.ctx.clearRect(0, 0, SIZE, SIZE); A.ctx.drawImage(A.img, 0, 0)
   if (f.type === 'taskforce') {
     tintRect(A, 0, 940, 690, 1108, f.tint)
-    // icons sit above the grid in the atlas; categories are columns, filled from the icon side
     const COLS = [344, 462, 580], ROWS = [1710, 1828, 1946]
     circles(A, f.perm, levelCells([f.adm, f.arm, f.cont]).map(([c, n]) => [COLS[c], ROWS[n]]), 38)
     drawText(A.ctx, clean(f.holder), TX.tfNick, '#ffc400')
   } else {
     tintRect(A, 1360, 960, 688, 1088, f.tint)
-    // this card is upside down in the atlas: icons above the grid here are below it in game
     const COLS = [1438, 1556, 1674], ROWS = [1522, 1640, 1756]
     circles(A, f.perm, levelCells([f.adm, f.arm, f.cont]).map(([c, n]) => [COLS[c], ROWS[n]]), 38)
     drawText(A.ctx, clean(f.label), TX.mgLabel, f.labelColor)
@@ -223,7 +204,6 @@ export class KeycardScene {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.toneMapping = THREE.NeutralToneMapping
-    // calibrated so a front-facing card shows its colours close to 1:1 (white ≈ 227); brighter washes tints out
     this.renderer.toneMappingExposure = 0.7
     container.appendChild(this.renderer.domElement)
 
@@ -240,7 +220,6 @@ export class KeycardScene {
     this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.enablePan = false; this.controls.minDistance = 4; this.controls.maxDistance = 14
-    // the back of a keycard can't be seen in game, so the view stays on the front (±60° tilt)
     this.controls.minAzimuthAngle = -Math.PI / 3; this.controls.maxAzimuthAngle = Math.PI / 3
     this.controls.minPolarAngle = Math.PI / 6; this.controls.maxPolarAngle = Math.PI * 5 / 6
     this.controls.addEventListener('change', () => this.render())
@@ -284,7 +263,7 @@ export class KeycardScene {
       root.traverse(o => {
         if (!o.isMesh) return
         const name = o.material.name || ''
-        if (name.startsWith('keycard_overlays')) { o.visible = false; return }   // wear decals
+        if (name.startsWith('keycard_overlays')) { o.visible = false; return }
         if (name.startsWith('keycard_icons')) {
           o.material = new THREE.MeshStandardMaterial({ map: icons.tex, roughness: 0.5, metalness: 0.1, alphaTest: 0.5 })
           const uv = o.geometry.attributes.uv
@@ -314,13 +293,11 @@ export class KeycardScene {
       if (o.userData.digit === undefined) return
       const ch = s[o.userData.digit], d = /\d/.test(ch) ? +ch : (dash ? 10 : 0)
       const uv = o.geometry.attributes.uv, src = o.userData.uv0
-      // glTF attributes may be interleaved, so never write uv.array directly
       for (let i = 0; i < uv.count; i++) uv.setXY(i, src[i][0], src[i][1] - d * DIGIT_STEP)
       uv.needsUpdate = true
     })
   }
 
-  // f: { cardType, tint, perm, labelColor (resolved #hex), label, holder, serial, rank, cont, arm, adm }
   async update(f) {
     const def = TYPES[f.cardType]
     if (!def) return

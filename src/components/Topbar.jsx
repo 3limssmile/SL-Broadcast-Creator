@@ -4,6 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 const NAV_LINKS = [
   { path: '/broadcast', label: 'Broadcast Creator', icon: 'fa-tower-broadcast' },
   { path: '/keycard', label: 'Keycard Creator', icon: 'fa-id-card' },
+  { path: '/cassie', label: 'CASSIE', icon: 'fa-bullhorn' },
   // Future tools can be added here
 ]
 

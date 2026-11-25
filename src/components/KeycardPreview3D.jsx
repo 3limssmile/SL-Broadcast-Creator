@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { KeycardScene, parseColor } from '../keycard/KeycardScene.js'
 
-// 'default' permission colour renders white in game (checked on a Task Force card)
 const DEFAULT_PERM = '#ffffff'
 
 export default function KeycardPreview3D({ fields }) {

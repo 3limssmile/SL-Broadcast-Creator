@@ -1,7 +1,6 @@
 import { useState, lazy, Suspense } from 'react'
 import CopyButton from '../components/CopyButton.jsx'
 
-// three.js + card assets load only when this page opens
 const KeycardPreview3D = lazy(() => import('../components/KeycardPreview3D.jsx'))
 
 // Fields required per card type
@@ -195,7 +194,6 @@ export default function KeycardCreator() {
             </div>
           </div>
 
-          {/* Preview Column */}
           <div className="grid-column">
             <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
               <h3><i className="fa-solid fa-id-card"></i> Preview</h3>
