@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import CopyButton from '../components/CopyButton.jsx'
 import { interpret, LINES, WORD } from '../cassie/interpret.js'
-import { CassiePlayer } from '../cassie/player.js'
+import { CassiePlayer, encodeWav } from '../cassie/player.js'
 import TemplatePicker from '../cassie/TemplatePicker.jsx'
 import { tmpRuns } from '../components/tmpText.js'
 import { isHexColor, shareUrl, useShared } from '../components/share.js'
@@ -87,6 +87,7 @@ export default function CassieCreator() {
   const [playing, setPlaying] = useState(null)
   const [current, setCurrent] = useState(-1)
   const [error, setError] = useState('')
+  const [rendering, setRendering] = useState(false)
   const [tab, setTab] = useState(shared.subtitles === 'Custom' ? 'subtitles' : 'words')
 
   const textareaRef = useRef(null)
@@ -143,6 +144,24 @@ export default function CassieCreator() {
   const listenTemplate = tts => {
     if (tts == null) { stop(); return }
     start(interpret(tts, noise), noise, 'template')
+  }
+
+  const download = async () => {
+    setError('')
+    setRendering(true)
+    try {
+      const blob = encodeWav(await player.current.render(result, noise))
+      const name = text.split(' ').filter(w => /^[A-Z0-9]+$/i.test(w)).slice(0, 5).join('-').toLowerCase() || 'announcement'
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `cassie-${name}.wav`
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch {
+      setError("Couldn't create the audio file. Your browser may not support Ogg Vorbis.")
+    }
+    setRendering(false)
   }
 
   const stop = () => {
@@ -270,6 +289,9 @@ export default function CassieCreator() {
                 : <button className="btn btn-primary" onClick={() => start(result, noise, 'message')} disabled={!result.clips.length}>
                     <i className="fa-solid fa-play"></i> Play
                   </button>}
+              <button className="btn btn-secondary" onClick={download} disabled={!result.clips.length || rendering} title="Download the announcement as a .wav file">
+                <i className={`fa-solid ${rendering ? 'fa-spinner fa-spin' : 'fa-download'}`}></i> {rendering ? 'Rendering' : 'Download .wav'}
+              </button>
               <span className="text-muted cassie-stats">
                 {result.duration.toFixed(1)} s
                 {unknown > 0 && <span className="cassie-warn"> · {unknown} unknown {unknown === 1 ? 'word' : 'words'} skipped</span>}

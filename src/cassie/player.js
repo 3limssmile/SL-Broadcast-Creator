@@ -110,45 +110,69 @@ export class CassiePlayer {
     return this.cache.get(name)
   }
 
-  async play(result, playBackground) {
-    this.stop()
-    const token = ++this.token
-    const ctx = this.context()
-    await ctx.resume()
+  async load(result, playBackground) {
     const ids = [...new Set(result.clips.map(c => c.line.id))]
     const [background, ...buffers] = await Promise.all([
       playBackground ? this.buffer('background') : null,
       ...ids.map(id => this.buffer(String(id))),
     ])
-    if (token !== this.token) return null
-    const byId = new Map(ids.map((id, i) => [id, buffers[i]]))
-    const out = ctx.createGain()
-    out.connect(ctx.destination)
-    this.out = out
-    const callTime = ctx.currentTime + 0.05
+    return { background, byId: new Map(ids.map((id, i) => [id, buffers[i]])) }
+  }
+
+  schedule(ctx, out, result, { background, byId }, callTime) {
     const origin = callTime + SCHEDULER_OFFSET
     let end = origin + result.duration
     const speech = []
     for (const clip of result.clips) {
-      const span = this.scheduleClip(byId.get(clip.line.id), clip, origin + clip.at, out)
+      const span = this.scheduleClip(ctx, byId.get(clip.line.id), clip, origin + clip.at, out)
       if (clip.line.name !== '.') speech.push(span)
       end = Math.max(end, span[1])
     }
-    if (background) end = Math.max(end, this.scheduleBackground(background, origin, result.duration, callTime, out, speech))
+    if (background) end = Math.max(end, this.scheduleBackground(ctx, background, origin, result.duration, callTime, out, speech))
     return { origin, end }
   }
 
-  source(buffer, destination, rate = 1) {
-    const src = this.ctx.createBufferSource()
+  async play(result, playBackground) {
+    this.stop()
+    const token = ++this.token
+    const ctx = this.context()
+    await ctx.resume()
+    const loaded = await this.load(result, playBackground)
+    if (token !== this.token) return null
+    const out = ctx.createGain()
+    out.connect(ctx.destination)
+    this.out = out
+    return this.schedule(ctx, out, result, loaded, ctx.currentTime + 0.05)
+  }
+
+  async render(result, playBackground) {
+    const loaded = await this.load(result, playBackground)
+    const sampleRate = 44100
+    let bound = SCHEDULER_OFFSET + Math.max(result.duration, BACKGROUND_MIN_DURATION) + 1
+    for (const { line, mods, at } of result.clips) {
+      const length = (mods.maxDuration ?? line.length) / (mods.pitch ?? 1) + stutterCost(mods.stutter)
+      bound = Math.max(bound, SCHEDULER_OFFSET + at + (mods.sleep ?? 0) + length + 1)
+    }
+    if (loaded.background) bound += loaded.background.duration
+    const ctx = new OfflineAudioContext(1, Math.ceil(bound * sampleRate), sampleRate)
+    const { origin, end } = this.schedule(ctx, ctx.destination, result, loaded, 0)
+    const data = (await ctx.startRendering()).getChannelData(0)
+    const from = Math.floor(origin * sampleRate)
+    let to = Math.min(data.length, Math.ceil((end + 0.1) * sampleRate))
+    while (to > from && Math.abs(data[to - 1]) < 1e-4) to--
+    return { samples: data.slice(from, Math.min(data.length, to + Math.round(0.05 * sampleRate))), sampleRate }
+  }
+
+  source(ctx, buffer, destination, rate = 1) {
+    const src = ctx.createBufferSource()
     src.buffer = buffer
     src.playbackRate.value = rate
     src.connect(destination)
-    this.nodes.push(src)
+    if (ctx === this.ctx) this.nodes.push(src)
     return src
   }
 
-  scheduleClip(buffer, { line, mods }, when, out) {
-    const ctx = this.ctx
+  scheduleClip(ctx, buffer, { line, mods }, when, out) {
     const pitch = mods.pitch ?? 1
     const start = when + (mods.sleep ?? 0)
     const offset = Math.min(Math.max(mods.startTime ?? 0, 0), Math.max(0, buffer.duration - 1 / buffer.sampleRate))
@@ -161,7 +185,7 @@ export class CassiePlayer {
       if (t >= end) break
       if (b <= a) continue
       const length = (b - a) / pitch
-      const src = this.source(buffer, gain, pitch)
+      const src = this.source(ctx, buffer, gain, pitch)
       src.start(t, a)
       src.stop(Math.min(end, t + length))
       t += length
@@ -169,8 +193,7 @@ export class CassiePlayer {
     return [start, Math.min(end, t)]
   }
 
-  scheduleBackground(buffer, start, duration, callTime, out, speech) {
-    const ctx = this.ctx
+  scheduleBackground(ctx, buffer, start, duration, callTime, out, speech) {
     const length = Math.max(duration, BACKGROUND_MIN_DURATION)
     const end = start + length
     const duck = ctx.createGain()
@@ -185,19 +208,19 @@ export class CassiePlayer {
     second.gain.value = 0
     first.connect(duck)
     second.connect(duck)
-    this.source(buffer, first).start(start, 0)
+    this.source(ctx, buffer, first).start(start, 0)
     const transition = start + evaluateCurve(TRANSITION_CURVE, length)
     first.gain.setValueCurveAtTime(sampleCurve(START_CURVE, BACKGROUND_VOLUME), transition, TRANSITION_LENGTH)
     second.gain.setValueCurveAtTime(sampleCurve(END_CURVE, BACKGROUND_VOLUME), transition, TRANSITION_LENGTH)
     const secondStart = end - BACKGROUND_END_MARK
     let finish = transition + TRANSITION_LENGTH
     if (secondStart - 0.15 >= callTime) {
-      this.source(buffer, second).start(secondStart, 0)
+      this.source(ctx, buffer, second).start(secondStart, 0)
       finish = secondStart + buffer.duration
     } else {
       const offset = callTime - (secondStart - 0.15)
       if (offset < buffer.duration) {
-        this.source(buffer, second).start(callTime, offset)
+        this.source(ctx, buffer, second).start(callTime, offset)
         finish = callTime + buffer.duration - offset
       }
     }
@@ -220,4 +243,29 @@ export class CassiePlayer {
     this.ctx?.close()
     this.ctx = null
   }
+}
+
+export function encodeWav({ samples, sampleRate }) {
+  let peak = 0
+  for (const v of samples) peak = Math.max(peak, Math.abs(v))
+  const scale = peak > 0.99 ? 0.99 / peak : 1
+  const view = new DataView(new ArrayBuffer(44 + samples.length * 2))
+  const text = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)) }
+  text(0, 'RIFF')
+  view.setUint32(4, 36 + samples.length * 2, true)
+  text(8, 'WAVE')
+  text(12, 'fmt ')
+  view.setUint32(16, 16, true)
+  view.setUint16(20, 1, true)
+  view.setUint16(22, 1, true)
+  view.setUint32(24, sampleRate, true)
+  view.setUint32(28, sampleRate * 2, true)
+  view.setUint16(32, 2, true)
+  view.setUint16(34, 16, true)
+  text(36, 'data')
+  view.setUint32(40, samples.length * 2, true)
+  for (let i = 0; i < samples.length; i++) {
+    view.setInt16(44 + i * 2, Math.round(Math.max(-1, Math.min(1, samples[i] * scale)) * 32767), true)
+  }
+  return new Blob([view], { type: 'audio/wav' })
 }
