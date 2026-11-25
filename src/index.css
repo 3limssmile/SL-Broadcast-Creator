@@ -721,6 +721,126 @@ input[type="number"].no-spin {
     border-bottom-color: var(--accent-blue);
 }
 
+.cassie-templates {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.template-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.template-chips button {
+    padding: 4px 9px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-family: monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.template-chips button:hover {
+    border-color: #555;
+}
+
+.template-chips button.active {
+    background-color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+.template-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 15px;
+}
+
+.template-field {
+    margin-bottom: 0;
+    min-width: 150px;
+}
+
+.template-field label {
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+}
+
+.template-field input,
+.template-field select {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
+.template-field input[type="number"] {
+    width: 110px;
+}
+
+.template-wide {
+    flex-basis: 100%;
+}
+
+.template-inline {
+    display: flex;
+    gap: 6px;
+}
+
+.template-inline select:first-child {
+    width: 130px;
+}
+
+.template-inline select:last-child {
+    width: 70px;
+}
+
+.template-preview {
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.template-preview code {
+    display: block;
+    color: #4ade80;
+    font-family: monospace;
+    overflow-wrap: anywhere;
+}
+
+.template-preview p {
+    margin-top: 6px;
+    color: var(--text-secondary);
+}
+
+.template-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.template-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.template-actions .btn {
+    padding: 8px 16px;
+}
+
 .cassie-custom {
     display: flex;
     flex-direction: column;

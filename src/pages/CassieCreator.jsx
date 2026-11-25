@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import CopyButton from '../components/CopyButton.jsx'
 import { interpret, LINES, WORD } from '../cassie/interpret.js'
 import { CassiePlayer } from '../cassie/player.js'
+import TemplatePicker from '../cassie/TemplatePicker.jsx'
 import { tmpRuns } from '../components/tmpText.js'
 import { buildRichText, ColorEffectPicker, RichTextEditor, RichTextRuns } from '../components/RichTextEditor.jsx'
 
@@ -96,6 +97,8 @@ export default function CassieCreator() {
   const subtitleHint = SUBTITLE_MODES.find(m => m[0] === subtitleMode)[2]
   const noiseHint = NOISE_MODES.find(m => m[0] === noise)[2]
 
+  const shownTab = tab === 'subtitles' && subtitleMode !== 'Custom' ? 'words' : tab
+
   const words = useMemo(() => {
     const q = search.trim().toUpperCase()
     return q ? LINES.filter(l => l.name.includes(q)) : LINES
@@ -110,6 +113,20 @@ export default function CassieCreator() {
     if (mode === 'Custom' && !customSubtitle.trim()) setCustomSubtitle(result.subtitle)
     if (mode === 'Custom') setTab('subtitles')
     setSubtitleMode(mode)
+  }
+
+  const applyTemplate = (tts, subtitle) => {
+    setMessage(tts)
+    if (subtitle != null) {
+      setCustomSubtitle(subtitle)
+      setEffect('none')
+      setSubtitleMode('Custom')
+    }
+  }
+
+  const listenTemplate = tts => {
+    if (tts == null) { stop(); return }
+    start(interpret(tts, noise), noise, 'template')
   }
 
   const stop = () => {
@@ -265,20 +282,22 @@ export default function CassieCreator() {
 
         <div className="grid-column">
           <div className="card" style={{ flex: 1, minHeight: 0, marginBottom: 0 }}>
-            {subtitleMode === 'Custom'
-              ? (
-                <div className="card-tabs" role="tablist">
-                  <button role="tab" aria-selected={tab === 'subtitles'} className={tab === 'subtitles' ? 'active' : ''} onClick={() => setTab('subtitles')}>
-                    <i className="fa-solid fa-closed-captioning"></i> Custom Subtitles
-                  </button>
-                  <button role="tab" aria-selected={tab === 'words'} className={tab === 'words' ? 'active' : ''} onClick={() => setTab('words')}>
-                    <i className="fa-solid fa-book"></i> Words ({LINES.length})
-                  </button>
-                </div>
-              )
-              : <h3><i className="fa-solid fa-book"></i> Words CASSIE knows ({LINES.length})</h3>}
+            <div className="card-tabs" role="tablist">
+              {[
+                ['words', 'fa-book', `Words (${LINES.length})`],
+                ['templates', 'fa-scroll', 'Templates'],
+                ...(subtitleMode === 'Custom' ? [['subtitles', 'fa-closed-captioning', 'Custom Subtitles']] : []),
+              ].map(([key, icon, label]) => (
+                <button key={key} role="tab" aria-selected={shownTab === key} className={shownTab === key ? 'active' : ''} onClick={() => setTab(key)}>
+                  <i className={`fa-solid ${icon}`}></i> {label}
+                </button>
+              ))}
+            </div>
 
-            {subtitleMode === 'Custom' && tab === 'subtitles' ? (
+            {shownTab === 'templates' && (
+              <TemplatePicker onApply={applyTemplate} onListen={listenTemplate} playing={playing === 'template'} />
+            )}
+            {shownTab === 'subtitles' && (
               <div className="cassie-custom">
                 <label htmlFor="cassie-custom">Text shown on screen:</label>
                 <RichTextEditor id="cassie-custom" value={customSubtitle} onChange={setCustomSubtitle}
@@ -287,7 +306,8 @@ export default function CassieCreator() {
                   <ColorEffectPicker id="cassie-effect" effect={effect} setEffect={setEffect} colors={colors} setColors={setColors} maxHeight={120} />
                 </div>
               </div>
-            ) : (<>
+            )}
+            {shownTab === 'words' && (<>
             <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
               style={{ padding: '8px 12px', marginBottom: 8, flexShrink: 0 }} />
             <div className="cassie-words">
