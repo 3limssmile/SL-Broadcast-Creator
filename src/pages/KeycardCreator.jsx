@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from 'react'
 import CopyButton from '../components/CopyButton.jsx'
+import { shareUrl, useShared } from '../components/share.js'
 
 const KeycardPreview3D = lazy(() => import('../components/KeycardPreview3D.jsx'))
 
@@ -48,23 +49,27 @@ function buildCommand(fields) {
   return 'ckeycard ' + args.join(' ')
 }
 
+const DEFAULTS = {
+  playerId: '',
+  cardType: 'KeycardCustomTaskForce',
+  invName: 'Custom_Keycard',
+  contLevel: '0',
+  armoryLevel: '0',
+  adminLevel: '0',
+  permColor: 'default',
+  tintColor: 'white',
+  label: 'My_Label',
+  labelColor: 'white',
+  holderName: 'Holder_Name',
+  serial: '123123123123',
+  rankDetail: '0',
+  wearLevel: '0',
+}
+const RULES = { cardType: Object.keys(REQS), rankDetail: ['0', '1', '2', '3'] }
+
 export default function KeycardCreator() {
-  const [fields, setFields] = useState({
-    playerId: '',
-    cardType: 'KeycardCustomTaskForce',
-    invName: 'Custom_Keycard',
-    contLevel: '0',
-    armoryLevel: '0',
-    adminLevel: '0',
-    permColor: 'default',
-    tintColor: 'white',
-    label: 'My_Label',
-    labelColor: 'white',
-    holderName: 'Holder_Name',
-    serial: '123123123123',
-    rankDetail: '0',
-    wearLevel: '0',
-  })
+  const shared = useShared(DEFAULTS, RULES)
+  const [fields, setFields] = useState(shared)
 
   const set = (key) => (e) => setFields(prev => ({ ...prev, [key]: e.target.value }))
 
@@ -229,6 +234,9 @@ export default function KeycardCreator() {
                 }}
               />
               <CopyButton getValue={() => command} style={{ flexShrink: 0, height: 45 }} />
+              <CopyButton getValue={() => shareUrl('/keycard', fields, DEFAULTS)} style={{ flexShrink: 0, height: 45 }}
+                className="btn btn-secondary" label="Copy Link" copiedLabel="Link copied!" icon="fa-link"
+                title="Link that opens this page with your keycard settings" />
             </div>
           </div>
         </div>

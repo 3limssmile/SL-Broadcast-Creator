@@ -1,13 +1,22 @@
 import { useMemo, useState } from 'react'
 import CopyButton from '../components/CopyButton.jsx'
 import { BASE_SIZE } from '../components/tmpText.js'
+import { isHexColor, shareUrl, useShared } from '../components/share.js'
 import { buildRichText, ColorEffectPicker, RichTextEditor, RichTextRuns } from '../components/RichTextEditor.jsx'
 
+const DEFAULTS = { text: 'Hello SCP:SL Server!', time: 10, effect: 'none', colors: ['#00FF20', '#33E0FF'] }
+const RULES = {
+  time: v => Number.isInteger(v) && v >= 1 && v <= 300,
+  effect: ['none', 'gradient', 'rainbow', 'random', 'randomWord'],
+  colors: v => v.length >= 2 && v.every(isHexColor),
+}
+
 export default function BroadcastCreator() {
-  const [text, setText] = useState('Hello SCP:SL Server!')
-  const [time, setTime] = useState(10)
-  const [effect, setEffect] = useState('none')
-  const [colors, setColors] = useState(['#00FF20', '#33E0FF'])
+  const shared = useShared(DEFAULTS, RULES)
+  const [text, setText] = useState(shared.text)
+  const [time, setTime] = useState(shared.time)
+  const [effect, setEffect] = useState(shared.effect)
+  const [colors, setColors] = useState(shared.colors)
 
   const built = useMemo(() => buildRichText(text, effect, colors), [text, effect, colors])
   const command = `bc ${time} ${built.text}`
@@ -77,7 +86,12 @@ export default function BroadcastCreator() {
                   value={command}
                   style={{ flexGrow: 1, resize: 'none', overflowY: 'auto', minHeight: 0, fontFamily: 'monospace', fontSize: '1rem', color: '#4ade80', backgroundColor: '#000', padding: '12px 15px' }}
                 />
-                <CopyButton getValue={() => command} />
+                <div className="output-buttons">
+                  <CopyButton getValue={() => command} />
+                  <CopyButton getValue={() => shareUrl('/broadcast', { text, time, effect, colors }, DEFAULTS)}
+                    className="btn btn-secondary" label="Copy Link" copiedLabel="Link copied!" icon="fa-link"
+                    title="Link that opens this page with your text and settings" />
+                </div>
               </div>
             </div>
           </div>

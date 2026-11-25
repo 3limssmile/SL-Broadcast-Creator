@@ -4,6 +4,7 @@ import { interpret, LINES, WORD } from '../cassie/interpret.js'
 import { CassiePlayer } from '../cassie/player.js'
 import TemplatePicker from '../cassie/TemplatePicker.jsx'
 import { tmpRuns } from '../components/tmpText.js'
+import { isHexColor, shareUrl, useShared } from '../components/share.js'
 import { buildRichText, ColorEffectPicker, RichTextEditor, RichTextRuns } from '../components/RichTextEditor.jsx'
 
 const MODIFIERS = [
@@ -58,20 +59,35 @@ function describe(token, clips) {
   return null
 }
 
+const DEFAULTS = {
+  message: 'ATTENTION ALL PERSONNEL . MTFUNIT EPSILON 11 DESIGNATED NINETAILEDFOX HASENTERED ALLREMAINING',
+  subtitles: 'Automatic',
+  noise: true,
+  subtitle: '',
+  effect: 'none',
+  colors: ['#00FF20', '#33E0FF'],
+}
+const RULES = {
+  subtitles: ['Automatic', 'Custom', 'None'],
+  effect: ['none', 'gradient', 'rainbow', 'random', 'randomWord'],
+  colors: v => v.length >= 2 && v.every(isHexColor),
+}
+
 export default function CassieCreator() {
-  const [message, setMessage] = useState('ATTENTION ALL PERSONNEL . MTFUNIT EPSILON 11 DESIGNATED NINETAILEDFOX HASENTERED ALLREMAINING')
-  const [subtitleMode, setSubtitleMode] = useState('Automatic')
-  const [noise, setNoise] = useState(true)
-  const [customSubtitle, setCustomSubtitle] = useState('')
-  const [effect, setEffect] = useState('none')
-  const [colors, setColors] = useState(['#00FF20', '#33E0FF'])
+  const shared = useShared(DEFAULTS, RULES)
+  const [message, setMessage] = useState(shared.message)
+  const [subtitleMode, setSubtitleMode] = useState(shared.subtitles)
+  const [noise, setNoise] = useState(shared.noise)
+  const [customSubtitle, setCustomSubtitle] = useState(shared.subtitle)
+  const [effect, setEffect] = useState(shared.effect)
+  const [colors, setColors] = useState(shared.colors)
   const [pitch, setPitch] = useState('0.9')
   const [glitch, setGlitch] = useState('.G1')
   const [search, setSearch] = useState('')
   const [playing, setPlaying] = useState(null)
   const [current, setCurrent] = useState(-1)
   const [error, setError] = useState('')
-  const [tab, setTab] = useState('words')
+  const [tab, setTab] = useState(shared.subtitles === 'Custom' ? 'subtitles' : 'words')
 
   const textareaRef = useRef(null)
   const player = useRef(null)
@@ -360,6 +376,14 @@ export default function CassieCreator() {
               }}
             />
             <CopyButton getValue={() => command} style={{ flexShrink: 0, height: 45 }} />
+            <CopyButton getValue={() => shareUrl('/cassie', {
+              message, subtitles: subtitleMode, noise,
+              subtitle: subtitleMode === 'Custom' ? customSubtitle : '',
+              effect: subtitleMode === 'Custom' ? effect : 'none',
+              colors: subtitleMode === 'Custom' ? colors : DEFAULTS.colors,
+            }, DEFAULTS)} style={{ flexShrink: 0, height: 45 }}
+              className="btn btn-secondary" label="Copy Link" copiedLabel="Link copied!" icon="fa-link"
+              title="Link that opens this page with your announcement and settings" />
           </div>
         </div>
       </div>

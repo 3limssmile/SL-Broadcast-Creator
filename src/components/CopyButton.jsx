@@ -1,6 +1,9 @@
 import { useState } from 'react'
 
-export default function CopyButton({ getValue, className = 'btn btn-primary', style }) {
+export default function CopyButton({
+  getValue, className = 'btn btn-primary', style,
+  label = 'Copy Command', copiedLabel = 'Copied!', icon = 'fa-copy', title,
+}) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -12,9 +15,9 @@ export default function CopyButton({ getValue, className = 'btn btn-primary', st
   }
 
   return (
-    <button className={copied ? className.replace('btn-primary', 'btn-secondary') : className} onClick={handleCopy} style={style}>
-      <i className={copied ? 'fa-solid fa-check' : 'fa-solid fa-copy'}></i>
-      {copied ? 'Copied!' : 'Copy Command'}
+    <button className={copied ? className.replace('btn-primary', 'btn-secondary') : className} onClick={handleCopy} style={style} title={title}>
+      <i className={copied ? 'fa-solid fa-check' : `fa-solid ${icon}`}></i>
+      {copied ? copiedLabel : label}
     </button>
   )
 }

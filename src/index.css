@@ -995,6 +995,16 @@ input[type="number"].no-spin {
     resize: none;
 }
 
+.output-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.output-buttons .btn {
+    flex: 1;
+}
+
 .output-row .copy-btn {
     align-self: flex-start;
     flex-shrink: 0;
