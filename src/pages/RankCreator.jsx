@@ -375,7 +375,7 @@ export default function RankCreator() {
     URL.revokeObjectURL(url)
   }
 
-  const shareLink = () => `${window.location.origin}${window.location.pathname}#/ranks?s=${encodeState(state)}`
+  const shareLink = () => `${window.location.origin}/ranks?s=${encodeState(state)}`
   const errors = problems.filter(p => p.level === 'error').length
 
   return (

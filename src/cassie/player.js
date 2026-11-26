@@ -1,6 +1,6 @@
 import { stutterCost } from './interpret.js'
 
-const BASE_URL = import.meta.env.BASE_URL + 'cassie/'
+const BASE_URL = import.meta.env.BASE_URL + 'audio/cassie/'
 const WORD_VOLUME = 0.6
 const BACKGROUND_VOLUME = 0.29
 const DUCK_LEVEL = 0.5

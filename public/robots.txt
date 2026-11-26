@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sl.elimssmile.dev/sitemap.xml

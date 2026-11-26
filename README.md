@@ -22,4 +22,4 @@ Code: MIT (see `LICENSE`).
 
 Content from SCP: Secret Laboratory by Northwood Studios is licensed under CC BY-SA 3.0:
 - keycard models and textures in `src/assets/keycard/` (see `src/assets/keycard/LICENSE.md`),
-- CASSIE voice lines in `public/cassie/`.
+- CASSIE voice lines in `public/audio/cassie/`.

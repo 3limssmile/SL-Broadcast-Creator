@@ -31,7 +31,7 @@ export function shareUrl(path, state, defaults) {
     if (!same(state[key], fallback)) params.set(key, encodeValue(state[key]))
   }
   const query = params.toString()
-  return `${window.location.origin}${window.location.pathname}#${path}${query ? '?' + query : ''}`
+  return `${window.location.origin}${path}${query ? '?' + query : ''}`
 }
 
 export function readShared(search, defaults, rules = {}) {
