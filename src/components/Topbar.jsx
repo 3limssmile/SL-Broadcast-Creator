@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { path: '/broadcast', label: 'Broadcast Creator', icon: 'fa-tower-broadcast' },
   { path: '/keycard', label: 'Keycard Creator', icon: 'fa-id-card' },
   { path: '/cassie', label: 'CASSIE', icon: 'fa-bullhorn' },
+  { path: '/ranks', label: 'Ranks & Badges', icon: 'fa-user-shield' },
   // Future tools can be added here
 ]
 
@@ -17,9 +18,8 @@ export default function Topbar() {
     setIsOpen(false)
   }, [location])
 
-  // Split links: max 3 visible in topbar
-  const visibleLinks = NAV_LINKS.slice(0, 3)
-  const overflowLinks = NAV_LINKS.slice(3)
+  const visibleLinks = NAV_LINKS.slice(0, 4)
+  const overflowLinks = NAV_LINKS.slice(4)
 
   return (
     <header className="topbar">
