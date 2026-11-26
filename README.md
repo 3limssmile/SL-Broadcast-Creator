@@ -1,9 +1,11 @@
 # SL Admin Tools
 
-Remote Admin helpers for SCP: Secret Laboratory, live at https://sl.elimssmile.dev/
+Tools for SCP: Secret Laboratory server admins, live at https://sl.elimssmile.dev/
 
-- **Broadcast Creator** - gradient and rich-text broadcasts.
-- **Keycard Creator** - builds `ckeycard` commands for custom keycards, with a live 3D preview of the card.
+- **Broadcast Creator**: gradient and rich-text broadcasts.
+- **Keycard Creator**: builds `ckeycard` commands for custom keycards, with a live 3D preview of the card.
+- **CASSIE**: writes CASSIE announcements with custom subtitles, plays them with the real voice lines and exports WAV.
+- **Ranks & Badges**: builds `config_remoteadmin.txt` with ranks, badges, permissions, staff members and ban templates, with an in-game preview of the badge.
 
 ## Development
 
@@ -17,4 +19,7 @@ npm run dev
 ## Licence
 
 Code: MIT (see `LICENSE`).
-Keycard models and textures in `src/assets/keycard/` are derived from SCP: Secret Laboratory by Northwood Studios and are licensed under CC BY-SA 3.0 - see `src/assets/keycard/LICENSE.md`.
+
+Content from SCP: Secret Laboratory by Northwood Studios is licensed under CC BY-SA 3.0:
+- keycard models and textures in `src/assets/keycard/` (see `src/assets/keycard/LICENSE.md`),
+- CASSIE voice lines in `public/cassie/`.

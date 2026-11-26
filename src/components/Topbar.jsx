@@ -49,7 +49,7 @@ export default function Topbar() {
       </nav>
 
       <div className="topbar-right">
-        <a href="https://github.com/3limssmile/SL-Broadcast-Creator" target="_blank" rel="noreferrer">
+        <a href="https://github.com/3limssmile/SL-Admin-Tools" target="_blank" rel="noreferrer">
           <i className="fa-brands fa-github"></i>
           GitHub
         </a>
@@ -78,7 +78,7 @@ export default function Topbar() {
             {link.label}
           </NavLink>
         ))}
-        <a href="https://github.com/3limssmile/SL-Broadcast-Creator" target="_blank" rel="noreferrer" style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)' }}>
+        <a href="https://github.com/3limssmile/SL-Admin-Tools" target="_blank" rel="noreferrer" style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)' }}>
           <i className="fa-brands fa-github"></i>
           GitHub Profile
         </a>
