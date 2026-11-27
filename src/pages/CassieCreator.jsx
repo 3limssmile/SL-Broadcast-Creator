@@ -386,7 +386,7 @@ export default function CassieCreator() {
         </h3>
         <div className="form-group" style={{ marginBottom: 0 }}>
           <label style={{ marginBottom: 8 }}>Paste this in RA console:</label>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div className="inline-output">
             <textarea
               readOnly
               value={command}

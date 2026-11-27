@@ -65,6 +65,8 @@ body {
     font-size: 1.2rem;
     color: var(--accent-blue);
     min-width: 200px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .topbar-nav {
@@ -83,6 +85,7 @@ body {
     border-radius: 5px;
     border: 1px solid transparent;
     display: flex;
+    white-space: nowrap;
     align-items: center;
     gap: 7px;
     transition: all 0.2s ease;
@@ -153,19 +156,51 @@ body {
 }
 
 .hamburger-menu a {
-    padding: 15px;
-    font-size: 1.1rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: 13px 15px;
+    font-size: 1.05rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
     color: var(--text-primary);
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.hamburger-menu a i {
+    width: 22px;
+    text-align: center;
+}
+
+.hamburger-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .hamburger-menu a.active {
     color: var(--accent-blue);
-    background-color: rgba(0, 168, 255, 0.05);
+    background-color: rgba(0, 168, 255, 0.1);
+    border-color: rgba(0, 168, 255, 0.25);
+}
+
+.mobile-menu-header {
+    margin-bottom: 10px;
+    color: var(--accent-blue);
+    font-weight: 700;
+}
+
+.mobile-menu-footer {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mobile-menu-footer a {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
 }
 
 .content-wrapper {
@@ -1005,6 +1040,12 @@ input[type="number"].no-spin {
     flex: 1;
 }
 
+.inline-output {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .output-row .copy-btn {
     align-self: flex-start;
     flex-shrink: 0;
@@ -1013,7 +1054,7 @@ input[type="number"].no-spin {
 /* Responsive */
 @media (max-width: 1100px) {
     .grid-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .kc-preview {
@@ -1029,13 +1070,40 @@ input[type="number"].no-spin {
     }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1100px), (max-height: 860px) {
     body, #root, .main-content {
         height: auto;
         min-height: 100vh;
         overflow: visible;
     }
 
+    .content-wrapper {
+        flex: none;
+    }
+
+    .cassie-grid,
+    .rk-grid {
+        grid-template-rows: none;
+    }
+
+    .cassie-words {
+        max-height: 360px;
+    }
+
+    .kc-preview {
+        min-height: 340px;
+    }
+
+    #bc-text {
+        min-height: 180px !important;
+    }
+
+    .rk-config {
+        min-height: 420px;
+    }
+}
+
+@media (max-width: 1100px) {
     .topbar-nav, .topbar-right {
         display: none;
     }
@@ -1048,10 +1116,17 @@ input[type="number"].no-spin {
         min-width: auto;
         flex: 1;
     }
+}
+
+@media (max-width: 850px) {
 
     .form-row {
         flex-direction: column;
         gap: 10px;
+    }
+
+    .form-row > .form-group {
+        flex: none !important;
     }
 
     .content-wrapper {
@@ -1062,6 +1137,30 @@ input[type="number"].no-spin {
 @media (max-width: 600px) {
     .topbar-left span {
         display: none;
+    }
+
+    .inline-output {
+        flex-wrap: wrap;
+    }
+
+    .inline-output textarea {
+        flex-basis: 100%;
+    }
+
+    .inline-output .btn {
+        flex: 1;
+    }
+
+    .content-wrapper {
+        padding: 10px;
+    }
+
+    .cassie-subtitle {
+        font-size: 17px;
+    }
+
+    .cassie-preview {
+        max-height: 220px;
     }
 }
 
@@ -1607,7 +1706,17 @@ input[type="number"].no-spin {
 
 @media (max-width: 850px) {
     .rk-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rk-editor-card .card-tabs {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .rk-editor-card .card-tabs button {
+        flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .rk-ranks {
@@ -1616,5 +1725,27 @@ input[type="number"].no-spin {
 
     .rk-row {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 851px) and (max-width: 1100px), (min-width: 851px) and (max-height: 860px) {
+    .rk-ranks-card {
+        position: sticky;
+        top: 10px;
+        align-self: start;
+        max-height: calc(100vh - 20px);
+    }
+}
+
+@media (min-width: 1101px) and (max-height: 860px) {
+    .rk-output-card {
+        position: sticky;
+        top: 10px;
+        align-self: start;
+        height: calc(100vh - 20px);
+    }
+
+    .rk-config {
+        min-height: 120px;
     }
 }

@@ -63,13 +63,10 @@ export default function Topbar() {
         <i className={`fa-solid ${isOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
       </button>
 
-      {/* Mobile / Overflow Menu */}
       <div className={`hamburger-menu ${isOpen ? 'open' : ''}`}>
-        <div className="mobile-menu-header" style={{ marginBottom: '20px', color: 'var(--accent-blue)', fontWeight: '700' }}>
-          Menu
-        </div>
+        <div className="mobile-menu-header">Menu</div>
         {NAV_LINKS.map(link => (
-          <NavLink 
+          <NavLink
             key={link.path}
             to={link.path}
             className={({ isActive }) => isActive ? 'active' : ''}
@@ -78,10 +75,16 @@ export default function Topbar() {
             {link.label}
           </NavLink>
         ))}
-        <a href="https://github.com/3limssmile/SL-Admin-Tools" target="_blank" rel="noreferrer" style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)' }}>
-          <i className="fa-brands fa-github"></i>
-          GitHub Profile
-        </a>
+        <div className="mobile-menu-footer">
+          <a href="https://github.com/3limssmile/SL-Admin-Tools" target="_blank" rel="noreferrer">
+            <i className="fa-solid fa-code"></i>
+            Source code
+          </a>
+          <a href="https://github.com/3limssmile" target="_blank" rel="noreferrer">
+            <i className="fa-brands fa-github"></i>
+            GitHub profile
+          </a>
+        </div>
       </div>
     </header>
   )
