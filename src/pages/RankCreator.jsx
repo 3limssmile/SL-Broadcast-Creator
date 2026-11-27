@@ -64,7 +64,7 @@ function visibleBadge(rank) {
   return { text, hex: COLOR_HEX[rank.color] ?? '#FFFFFF' }
 }
 
-function BadgePreview({ rank }) {
+export function BadgePreview({ rank }) {
   const [shown, setShown] = useState(false)
   const badge = visibleBadge(rank)
   const visible = badge && (!rank.hidden || shown)

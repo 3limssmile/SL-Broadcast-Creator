@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 
 const NAV_LINKS = [
   { path: '/broadcast', label: 'Broadcast Creator', icon: 'fa-tower-broadcast' },
   { path: '/keycard', label: 'Keycard Creator', icon: 'fa-id-card' },
   { path: '/cassie', label: 'CASSIE', icon: 'fa-bullhorn' },
   { path: '/ranks', label: 'Ranks & Badges', icon: 'fa-user-shield' },
-  // Future tools can be added here
 ]
 
 export default function Topbar() {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
 
-  // Close menu on route change
   useEffect(() => {
     setIsOpen(false)
   }, [location])
@@ -23,10 +21,10 @@ export default function Topbar() {
 
   return (
     <header className="topbar">
-      <div className="topbar-left">
+      <Link to="/" className="topbar-left">
         <i className="fa-solid fa-server"></i>
         <span>SCP:SL Admin Tools</span>
-      </div>
+      </Link>
 
       <nav className="topbar-nav">
         {visibleLinks.map(link => (

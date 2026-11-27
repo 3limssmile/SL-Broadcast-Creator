@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import Home from './pages/Home.jsx'
 import Topbar from './components/Topbar.jsx'
 import BroadcastCreator from './pages/BroadcastCreator.jsx'
 import KeycardCreator from './pages/KeycardCreator.jsx'
@@ -17,7 +18,8 @@ export default function App() {
     <div className="main-content">
       <Topbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/broadcast" replace />} />
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/broadcast" element={<BroadcastCreator key={search} />} />
         <Route path="/keycard" element={<KeycardCreator key={search} />} />
         <Route path="/cassie" element={<CassieCreator key={search} />} />
